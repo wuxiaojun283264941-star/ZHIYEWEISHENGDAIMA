@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  occupational-health:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: occupational-health
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      - JWT_SECRET=change_me_to_a_strong_random_key_at_least_32_chars
+      - JWT_EXPIRES_IN=24h
+      - UPLOAD_DIR=uploads/reports
+      - MAX_FILE_SIZE=20971520
+    volumes:
+      # 持久化数据库文件
+      - ./data:/app/server/data
+      # 持久化上传的体检报告 PDF
+      - ./uploads:/app/server/uploads/reports

@@ -1,0 +1,35 @@
+# Dependencies
+node_modules/
+
+# Build output
+client/dist/
+
+# Environment variables
+server/.env
+
+# Database
+server/data/*.db
+server/data/*.db-shm
+server/data/*.db-wal
+
+# Uploads
+uploads/reports/*
+server/uploads/reports/*
+
+# WorkBuddy memory (internal)
+.workbuddy/
+
+# Logs
+logs/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# Backups
+backups/
