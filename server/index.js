@@ -4,16 +4,23 @@ import cors from '@fastify/cors';
 import multipart from '@fastify/multipart';
 import staticPlugin from '@fastify/static';
 import path from 'path';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { initDB } from './db/init.js';
+
+// Route modules
 import authRoutes from './routes/auth.js';
+import adminRoutes from './routes/admin.js';
 import employeeRoutes from './routes/employee.js';
+import positionRoutes from './routes/position.js';
+import hazardFactorRoutes from './routes/hazardFactor.js';
 import factoryContactRoutes from './routes/factoryContact.js';
 import healthAgentRoutes from './routes/healthAgent.js';
 import examTaskRoutes from './routes/examTask.js';
 import examReportRoutes from './routes/examReport.js';
+import examPackageRoutes from './routes/examPackage.js';
+import dashboardRoutes from './routes/dashboard.js';
 import cUnitRoutes from './routes/cUnit.js';
-import adminRoutes from './routes/admin.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -27,6 +34,10 @@ await app.register(multipart, {
 
 // Serve uploaded files statically
 const uploadsDir = path.join(__dirname, process.env.UPLOAD_DIR || 'uploads/reports');
+// Ensure uploads directory exists
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
 await app.register(staticPlugin, {
   root: uploadsDir,
   prefix: '/uploads/reports/',
@@ -36,7 +47,6 @@ await app.register(staticPlugin, {
 // Serve frontend static files in production
 const publicDir = path.join(__dirname, 'public');
 try {
-  const { default: fs } = await import('fs');
   if (fs.existsSync(publicDir)) {
     await app.register(staticPlugin, {
       root: publicDir,
@@ -48,7 +58,7 @@ try {
       if (!request.url.startsWith('/api') && !request.url.startsWith('/uploads')) {
         return reply.sendFile('index.html');
       }
-      return reply.code(404).send({ code: 1, message: 'Not Found' });
+      return reply.code(404).send({ code: -1, data: null, message: 'Not Found' });
     });
     console.log('Serving frontend static files from:', publicDir);
   }
@@ -59,15 +69,37 @@ try {
 // Initialize database
 initDB();
 
-// Register routes
+// Auto-seed on first run (if no admin user exists)
+import { getDB } from './db/init.js';
+const db = getDB();
+const adminCount = db.prepare('SELECT COUNT(*) as cnt FROM users WHERE role = ?').get('admin');
+if (adminCount.cnt === 0) {
+  console.log('No admin user found, running seed...');
+  const { execSync } = await import('child_process');
+  const __filename2 = fileURLToPath(import.meta.url);
+  const __dirname2 = path.dirname(__filename2);
+  try {
+    execSync(`node "${path.join(__dirname2, 'db', 'seed.js')}"`, { stdio: 'inherit' });
+  } catch (e) {
+    console.error('Seed failed (non-fatal):', e.message);
+  }
+}
+
+// ============================================================
+// Register all route modules
+// ============================================================
 app.register(authRoutes, { prefix: '/api/auth' });
+app.register(adminRoutes, { prefix: '/api/admin' });
 app.register(employeeRoutes, { prefix: '/api/employees' });
+app.register(positionRoutes, { prefix: '/api/positions' });
+app.register(hazardFactorRoutes, { prefix: '/api/hazard-factors' });
 app.register(factoryContactRoutes, { prefix: '/api/factory-contacts' });
 app.register(healthAgentRoutes, { prefix: '/api/health-agents' });
 app.register(examTaskRoutes, { prefix: '/api/exam-tasks' });
 app.register(examReportRoutes, { prefix: '/api/exam-reports' });
+app.register(examPackageRoutes, { prefix: '/api/exam-packages' });
+app.register(dashboardRoutes, { prefix: '/api/dashboard' });
 app.register(cUnitRoutes, { prefix: '/api/cunit' });
-app.register(adminRoutes, { prefix: '/api/admin' });
 
 // Health check
 app.get('/api/health', async () => ({ status: 'ok', timestamp: new Date().toISOString() }));
