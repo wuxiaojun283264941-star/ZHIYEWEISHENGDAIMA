@@ -3,7 +3,7 @@
 Install acme.sh on NAS and issue Let's Encrypt SSL certificate
 using Alibaba Cloud DNS-01 challenge for lvhuianquan.icu
 """
-import paramiko, time, json
+import paramiko, time, json, os
 
 HOST, PORT = '100.66.1.6', 6884
 USER, PWD = 'wuxiaojun66', 'wu@xj123'
@@ -11,9 +11,9 @@ SUDO = f'echo {PWD} | sudo -S'
 DOMAIN = 'lvhuianquan.icu'
 NAS_APP = '/vol2/1000/ZY/occupational-health'
 
-# Alibaba Cloud AccessKey (for DNS-01 challenge)
-AK_ID = 'ENV_AK_ID'
-AK_SECRET = 'ENV_AK_SECRET'
+# Alibaba Cloud AccessKey (for DNS-01 challenge) - set via env vars
+AK_ID = os.environ.get('ALI_AK_ID', '')
+AK_SECRET = os.environ.get('ALI_AK_SECRET', '')
 
 ssh = paramiko.SSHClient()
 ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
