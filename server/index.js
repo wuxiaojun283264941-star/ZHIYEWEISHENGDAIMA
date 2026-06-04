@@ -54,9 +54,10 @@ try {
       decorateReply: false
     });
     // SPA fallback: return index.html for non-API/non-upload routes
+    const indexHtml = fs.readFileSync(path.join(publicDir, 'index.html'), 'utf-8');
     app.setNotFoundHandler((request, reply) => {
       if (!request.url.startsWith('/api') && !request.url.startsWith('/uploads')) {
-        return reply.sendFile('index.html');
+        return reply.type('text/html').send(indexHtml);
       }
       return reply.code(404).send({ code: -1, data: null, message: 'Not Found' });
     });
