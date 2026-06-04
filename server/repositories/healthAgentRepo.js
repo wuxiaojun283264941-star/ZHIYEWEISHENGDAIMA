@@ -1,5 +1,11 @@
 import { getDB } from '../db/init.js';
 
+/** Find health agent by username */
+export function findHealthAgentByUsername(username) {
+  const db = getDB();
+  return db.prepare('SELECT * FROM health_agents WHERE username = ?').get(username);
+}
+
 /** Find health agent by phone */
 export function findHealthAgentByPhone(phone) {
   const db = getDB();

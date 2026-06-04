@@ -1,21 +1,21 @@
 import apiClient from './client';
 
+/** Admin login */
+export function adminLogin(username, password) {
+  return apiClient.post('/auth/admin-login', { username, password });
+}
+
 /** Factory login */
 export function factoryLogin(username, password) {
   return apiClient.post('/auth/factory-login', { username, password });
 }
 
-/** Send SMS code to health agent */
-export function agentSendCode(phone) {
-  return apiClient.post('/auth/agent-send-code', { phone });
+/** Health agent (体检) login */
+export function agentLogin(username, password) {
+  return apiClient.post('/auth/agent-login', { username, password });
 }
 
-/** Health agent login */
-export function agentLogin(phone, code) {
-  return apiClient.post('/auth/agent-login', { phone, code });
-}
-
-/** C-unit login */
+/** C-unit (卫生托管) login */
 export function cunitLogin(username, password) {
   return apiClient.post('/auth/cunit-login', { username, password });
 }

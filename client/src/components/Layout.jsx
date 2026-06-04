@@ -16,11 +16,21 @@ import {
   Logout as LogoutIcon,
   Dashboard as DashboardIcon,
   Description as DescriptionIcon,
+  AdminPanelSettings as AdminIcon,
+  Business as BusinessIcon,
 } from '@mui/icons-material';
 import { useAuth } from '../hooks/useAuth';
 import { useRole } from '../hooks/useRole';
 
 const DRAWER_WIDTH = 240;
+
+const adminMenu = [
+  { text: '工作台', icon: <DashboardIcon />, path: '/admin' },
+  { text: '全部工厂', icon: <BusinessIcon />, path: '/admin/factories' },
+  { text: '全部任务', icon: <TaskIcon />, path: '/admin/tasks' },
+  { text: '体检中心', icon: <HospitalIcon />, path: '/admin/agents' },
+  { text: '卫生托管', icon: <ScienceIcon />, path: '/admin/cunits' },
+];
 
 const factoryMenu = [
   { text: '工作台', icon: <DashboardIcon />, path: '/factory' },
@@ -41,12 +51,14 @@ const cUnitMenu = [
 ];
 
 const roleLabels = {
+  admin: '管理员',
   factory: '工厂',
-  health_agent: '体检对接人',
-  cunit: 'C单位',
+  health_agent: '体检',
+  cunit: '卫生托管',
 };
 
 const roleColors = {
+  admin: 'error',
   factory: 'primary',
   health_agent: 'success',
   cunit: 'secondary',
@@ -58,7 +70,8 @@ function Layout({ children }) {
   const { user, logout } = useAuth();
   const { role } = useRole();
 
-  const menuItems = role === 'factory' ? factoryMenu
+  const menuItems = role === 'admin' ? adminMenu
+    : role === 'factory' ? factoryMenu
     : role === 'health_agent' ? healthAgentMenu
     : cUnitMenu;
 

@@ -58,10 +58,20 @@ export function initDB() {
       FOREIGN KEY (factory_id) REFERENCES factories(id) ON DELETE CASCADE
     );
 
+    CREATE TABLE IF NOT EXISTS admins (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL,
+      username TEXT NOT NULL UNIQUE,
+      password_hash TEXT NOT NULL,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+
     CREATE TABLE IF NOT EXISTS health_agents (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL,
-      phone TEXT NOT NULL UNIQUE,
+      username TEXT NOT NULL UNIQUE,
+      password_hash TEXT NOT NULL,
+      phone TEXT DEFAULT '',
       center_name TEXT DEFAULT '',
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );

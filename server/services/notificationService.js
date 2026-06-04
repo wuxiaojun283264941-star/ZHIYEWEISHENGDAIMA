@@ -11,7 +11,7 @@ export function notifyTaskPushed(agentPhone, factoryName, employeeCount) {
 
 /** Send notification when task is completed */
 export function notifyTaskCompleted(factoryName, agentName) {
-  console.log(`[NOTIFICATION] 任务完成通知 -> ${factoryName}: ${agentName} 已完成体检推送C单位`);
+  console.log(`[NOTIFICATION] 任务完成通知 -> ${factoryName}: ${agentName} 已完成体检推送至卫生托管`);
   return true;
 }
 

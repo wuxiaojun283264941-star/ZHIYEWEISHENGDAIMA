@@ -3,6 +3,11 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import ProtectedRoute from './components/ProtectedRoute';
 import RoleRouter from './components/RoleRouter';
 import Login from './pages/Login';
+import AdminDashboard from './pages/admin/Dashboard';
+import AdminFactories from './pages/admin/FactoryList';
+import AdminAgents from './pages/admin/AgentList';
+import AdminCUnits from './pages/admin/CUnitList';
+import AdminTasks from './pages/admin/TaskList';
 import FactoryDashboard from './pages/factory/Dashboard';
 import EmployeeList from './pages/factory/EmployeeList';
 import EmployeeForm from './pages/factory/EmployeeForm';
@@ -23,6 +28,13 @@ function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/" element={<ProtectedRoute><RoleRouter /></ProtectedRoute>} />
 
+      {/* Admin routes */}
+      <Route path="/admin" element={<ProtectedRoute role="admin"><AdminDashboard /></ProtectedRoute>} />
+      <Route path="/admin/factories" element={<ProtectedRoute role="admin"><AdminFactories /></ProtectedRoute>} />
+      <Route path="/admin/agents" element={<ProtectedRoute role="admin"><AdminAgents /></ProtectedRoute>} />
+      <Route path="/admin/cunits" element={<ProtectedRoute role="admin"><AdminCUnits /></ProtectedRoute>} />
+      <Route path="/admin/tasks" element={<ProtectedRoute role="admin"><AdminTasks /></ProtectedRoute>} />
+
       {/* Factory routes */}
       <Route path="/factory" element={<ProtectedRoute role="factory"><FactoryDashboard /></ProtectedRoute>} />
       <Route path="/factory/employees" element={<ProtectedRoute role="factory"><EmployeeList /></ProtectedRoute>} />
@@ -37,7 +49,7 @@ function App() {
       <Route path="/health-agent/tasks/:id" element={<ProtectedRoute role="health_agent"><TaskDetail /></ProtectedRoute>} />
       <Route path="/health-agent/history" element={<ProtectedRoute role="health_agent"><History /></ProtectedRoute>} />
 
-      {/* C-Unit routes */}
+      {/* 卫生托管 routes */}
       <Route path="/cunit" element={<ProtectedRoute role="cunit"><CUnitDashboard /></ProtectedRoute>} />
       <Route path="/cunit/reports" element={<ProtectedRoute role="cunit"><ReportList /></ProtectedRoute>} />
       <Route path="/cunit/employees/:id" element={<ProtectedRoute role="cunit"><EmployeeDetail /></ProtectedRoute>} />

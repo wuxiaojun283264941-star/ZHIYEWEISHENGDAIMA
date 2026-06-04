@@ -27,7 +27,7 @@ function CompleteConfirm({ open, onClose, taskId, onSuccess }) {
       <DialogTitle>确认完成</DialogTitle>
       <DialogContent>
         {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
-        <Typography>确认将此任务标记为已完成并推送C单位？此操作不可撤销。</Typography>
+        <Typography>确认将此任务标记为已完成并推送至卫生托管单位？此操作不可撤销。</Typography>
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose} disabled={loading}>取消</Button>

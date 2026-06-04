@@ -11,6 +11,8 @@ function RoleRouter() {
   if (!user) return <Navigate to="/login" replace />;
 
   switch (user.role) {
+    case 'admin':
+      return <Navigate to="/admin" replace />;
     case 'factory':
       return <Navigate to="/factory" replace />;
     case 'health_agent':

@@ -3,7 +3,7 @@ import { findEmployeesByIds } from '../repositories/employeeRepo.js';
 
 /** Push exam task from factory */
 export function pushExamTask(factoryId, { health_agent_id, factory_contact_id, employee_ids }) {
-  if (!health_agent_id) throw new Error('请选择体检对接人');
+  if (!health_agent_id) throw new Error('请选择体检中心');
   if (!employee_ids || employee_ids.length === 0) throw new Error('请选择体检员工');
 
   // Validate employee_ids belong to this factory

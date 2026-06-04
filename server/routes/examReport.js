@@ -51,7 +51,8 @@ export default async function examReportRoutes(fastify) {
     }
   });
 
-  /** GET /api/exam-reports/:id/download - download report PDF */
+  /** GET /api/exam-reports/:id/download - download report PDF
+   *  Browser direct navigation supported via ?token= query param */
   fastify.get('/:id/download', async (request, reply) => {
     try {
       const report = getReport(Number(request.params.id));

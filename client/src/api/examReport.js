@@ -18,9 +18,10 @@ export function getReport(id) {
   return apiClient.get(`/exam-reports/${id}`);
 }
 
-/** Get report download URL */
+/** Get report download URL with auth token for browser direct navigation */
 export function getReportDownloadUrl(id) {
-  return `/api/exam-reports/${id}/download`;
+  const token = localStorage.getItem('token');
+  return `/api/exam-reports/${id}/download?token=${encodeURIComponent(token || '')}`;
 }
 
 /** Delete report */

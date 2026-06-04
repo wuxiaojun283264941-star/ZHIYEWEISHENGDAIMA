@@ -26,8 +26,8 @@ function Dashboard() {
   return (
     <Layout>
       <Box sx={{ mb: 3 }}>
-        <Typography variant="h5" fontWeight={600}>欢迎，{user?.name || 'C单位管理员'}</Typography>
-        <Typography variant="body2" color="text.secondary">C单位工作台</Typography>
+        <Typography variant="h5" fontWeight={600}>欢迎，{user?.name || '卫生托管管理员'}</Typography>
+        <Typography variant="body2" color="text.secondary">卫生托管工作台</Typography>
       </Box>
 
       <Grid container spacing={3} sx={{ mb: 4 }}>

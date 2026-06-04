@@ -57,7 +57,7 @@ function PushTaskDialog({ open, onClose, onSuccess }) {
 
   const handleSubmit = async () => {
     setError('');
-    if (!selectedAgent) { setError('请选择体检对接人'); return; }
+    if (!selectedAgent) { setError('请选择体检中心'); return; }
     if (selectedEmployees.length === 0) { setError('请选择体检员工'); return; }
 
     setSaving(true);
@@ -85,8 +85,8 @@ function PushTaskDialog({ open, onClose, onSuccess }) {
         {loading ? <CircularProgress /> : (
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
             <FormControl fullWidth size="small">
-              <InputLabel>体检对接人 *</InputLabel>
-              <Select value={selectedAgent} onChange={(e) => setSelectedAgent(e.target.value)} label="体检对接人 *">
+              <InputLabel>体检中心 *</InputLabel>
+              <Select value={selectedAgent} onChange={(e) => setSelectedAgent(e.target.value)} label="体检中心 *">
                 {agents.map((a) => (
                   <MenuItem key={a.id} value={a.id}>{a.name} - {a.center_name} ({a.phone})</MenuItem>
                 ))}

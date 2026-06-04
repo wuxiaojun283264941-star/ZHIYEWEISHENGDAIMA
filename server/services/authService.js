@@ -1,9 +1,9 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { findFactoryByUsername } from '../repositories/factoryRepo.js';
-import { findHealthAgentByPhone } from '../repositories/healthAgentRepo.js';
+import { findHealthAgentByUsername } from '../repositories/healthAgentRepo.js';
 import { findCUnitAgentByUsername } from '../repositories/cUnitAgentRepo.js';
-import { getDB } from '../db/init.js';
+import { findAdminByUsername } from '../repositories/adminRepo.js';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'occupational_health_secret_key_2024';
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '24h';
@@ -11,6 +11,23 @@ const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '24h';
 /** Generate JWT token */
 function generateToken(payload) {
   return jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
+}
+
+/** Admin login with username/password */
+export function adminLogin(username, password) {
+  const admin = findAdminByUsername(username);
+  if (!admin) {
+    throw new Error('用户名或密码错误');
+  }
+  const valid = bcrypt.compareSync(password, admin.password_hash);
+  if (!valid) {
+    throw new Error('用户名或密码错误');
+  }
+  const token = generateToken({ id: admin.id, role: 'admin', name: admin.name });
+  return {
+    token,
+    user: { id: admin.id, role: 'admin', name: admin.name, username: admin.username }
+  };
 }
 
 /** Factory login with username/password */
@@ -30,40 +47,16 @@ export function factoryLogin(username, password) {
   };
 }
 
-/** Send SMS code to health agent (mock: fixed code 123456) */
-export function agentSendCode(phone) {
-  const agent = findHealthAgentByPhone(phone);
+/** Health agent login with username/password */
+export function healthAgentLogin(username, password) {
+  const agent = findHealthAgentByUsername(username);
   if (!agent) {
-    throw new Error('该手机号未注册为体检对接人');
+    throw new Error('用户名或密码错误');
   }
-
-  const db = getDB();
-  const code = '123456'; // Fixed code for testing
-  const expireAt = new Date(Date.now() + 5 * 60 * 1000).toISOString();
-
-  db.prepare(
-    `INSERT INTO sms_codes (phone, code, expire_at) VALUES (?, ?, ?)`
-  ).run(phone, code, expireAt);
-
-  return { message: '验证码已发送', code }; // Return code for testing convenience
-}
-
-/** Health agent login with phone + SMS code */
-export function agentLogin(phone, code) {
-  const agent = findHealthAgentByPhone(phone);
-  if (!agent) {
-    throw new Error('该手机号未注册为体检对接人');
+  const valid = bcrypt.compareSync(password, agent.password_hash);
+  if (!valid) {
+    throw new Error('用户名或密码错误');
   }
-
-  const db = getDB();
-  const smsRecord = db.prepare(
-    `SELECT * FROM sms_codes WHERE phone = ? AND code = ? AND expire_at > datetime('now') ORDER BY created_at DESC LIMIT 1`
-  ).get(phone, code);
-
-  if (!smsRecord) {
-    throw new Error('验证码错误或已过期');
-  }
-
   const token = generateToken({ id: agent.id, role: 'health_agent', name: agent.name });
   return {
     token,
@@ -71,7 +64,7 @@ export function agentLogin(phone, code) {
   };
 }
 
-/** C-unit login with username/password */
+/** C-unit (卫生托管) login with username/password */
 export function cunitLogin(username, password) {
   const agent = findCUnitAgentByUsername(username);
   if (!agent) {

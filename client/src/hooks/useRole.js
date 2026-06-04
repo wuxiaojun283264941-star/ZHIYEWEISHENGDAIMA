@@ -7,6 +7,7 @@ export function useRole() {
   return {
     role,
     user,
+    isAdmin: role === 'admin',
     isFactory: role === 'factory',
     isHealthAgent: role === 'health_agent',
     isCUnit: role === 'cunit',

@@ -13,6 +13,7 @@ import healthAgentRoutes from './routes/healthAgent.js';
 import examTaskRoutes from './routes/examTask.js';
 import examReportRoutes from './routes/examReport.js';
 import cUnitRoutes from './routes/cUnit.js';
+import adminRoutes from './routes/admin.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -66,6 +67,7 @@ app.register(healthAgentRoutes, { prefix: '/api/health-agents' });
 app.register(examTaskRoutes, { prefix: '/api/exam-tasks' });
 app.register(examReportRoutes, { prefix: '/api/exam-reports' });
 app.register(cUnitRoutes, { prefix: '/api/cunit' });
+app.register(adminRoutes, { prefix: '/api/admin' });
 
 // Health check
 app.get('/api/health', async () => ({ status: 'ok', timestamp: new Date().toISOString() }));

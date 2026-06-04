@@ -19,8 +19,15 @@ async function seed() {
     DELETE FROM factories;
     DELETE FROM health_agents;
     DELETE FROM c_unit_agents;
+    DELETE FROM admins;
     DELETE FROM sms_codes;
   `);
+
+  // Insert admin
+  const adminInsert = db.prepare(
+    `INSERT INTO admins (name, username, password_hash) VALUES (?, ?, ?)`
+  );
+  adminInsert.run('系统管理员', 'admin', passwordHash);
 
   // Insert factory
   const factoryInsert = db.prepare(
@@ -47,9 +54,9 @@ async function seed() {
 
   // Insert health agent
   const agentInsert = db.prepare(
-    `INSERT INTO health_agents (name, phone, center_name) VALUES (?, ?, ?)`
+    `INSERT INTO health_agents (name, username, password_hash, phone, center_name) VALUES (?, ?, ?, ?, ?)`
   );
-  const agentResult = agentInsert.run('陈医生', '13800138001', '市中心体检中心');
+  const agentResult = agentInsert.run('陈医生', 'agent1', passwordHash, '13800138001', '市中心体检中心');
   const agentId = agentResult.lastInsertRowid;
 
   // Insert exam task (pushed)
@@ -66,16 +73,17 @@ async function seed() {
   taskEmpInsert.run(taskId, emp1.lastInsertRowid, 'pending');
   taskEmpInsert.run(taskId, emp2.lastInsertRowid, 'pending');
 
-  // Insert C unit agent
+  // Insert C unit agent (卫生托管)
   const cUnitInsert = db.prepare(
     `INSERT INTO c_unit_agents (name, username, password_hash) VALUES (?, ?, ?)`
   );
   cUnitInsert.run('刘主任', 'cunit1', passwordHash);
 
   console.log('Seed data inserted successfully');
+  console.log('  Admin: admin / 123456');
   console.log(`  Factory: factory1 / 123456 (id=${factoryId})`);
-  console.log(`  Health Agent: 13800138001 / 123456 (id=${agentId})`);
-  console.log(`  C-Unit: cunit1 / 123456`);
+  console.log(`  Agent (体检): agent1 / 123456 (id=${agentId})`);
+  console.log('  C-Unit (卫生托管): cunit1 / 123456');
 }
 
 seed().catch(err => {

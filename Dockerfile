@@ -13,6 +13,9 @@ RUN npm run build
 # ===== 运行阶段 =====
 FROM node:20-alpine
 
+# 替换 Alpine 软件源为国内镜像
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
+
 # 安装 better-sqlite3 编译依赖
 RUN apk add --no-cache python3 make g++
 

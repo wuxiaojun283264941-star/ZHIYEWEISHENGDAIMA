@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import {
-  Box, Card, CardContent, Typography, TextField, Button, Tabs, Tab, Alert,
-  InputAdornment, IconButton, CircularProgress
+  Box, Card, CardContent, Typography, TextField, Button, Tabs, Tab, Alert, CircularProgress
 } from '@mui/material';
-import { Factory, LocalHospital, Science, Phone, Send, Visibility, VisibilityOff } from '@mui/icons-material';
-import { factoryLogin, agentSendCode, agentLogin, cunitLogin } from '../api/auth';
+import { AdminPanelSettings, Factory, LocalHospital, Science } from '@mui/icons-material';
+import { adminLogin, factoryLogin, agentLogin, cunitLogin } from '../api/auth';
 import { useAuth } from '../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 
@@ -19,16 +18,35 @@ function Login() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  // Admin login state
+  const [adminForm, setAdminForm] = useState({ username: '', password: '' });
+
   // Factory login state
   const [factoryForm, setFactoryForm] = useState({ username: '', password: '' });
 
-  // Health agent login state
-  const [agentForm, setAgentForm] = useState({ phone: '', code: '' });
-  const [codeSent, setCodeSent] = useState(false);
-  const [countdown, setCountdown] = useState(0);
+  // Health agent (体检) login state
+  const [agentForm, setAgentForm] = useState({ username: '', password: '' });
 
-  // C-Unit login state
+  // 卫生托管 login state
   const [cunitForm, setCunitForm] = useState({ username: '', password: '' });
+
+  const handleAdminLogin = async () => {
+    setError('');
+    if (!adminForm.username || !adminForm.password) {
+      setError('请输入用户名和密码');
+      return;
+    }
+    setLoading(true);
+    try {
+      const res = await adminLogin(adminForm.username, adminForm.password);
+      login(res.data.token, res.data.user);
+      navigate('/admin');
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleFactoryLogin = async () => {
     setError('');
@@ -48,36 +66,15 @@ function Login() {
     }
   };
 
-  const handleSendCode = async () => {
-    setError('');
-    if (!agentForm.phone) {
-      setError('请输入手机号');
-      return;
-    }
-    try {
-      await agentSendCode(agentForm.phone);
-      setCodeSent(true);
-      setCountdown(60);
-      const timer = setInterval(() => {
-        setCountdown((prev) => {
-          if (prev <= 1) { clearInterval(timer); return 0; }
-          return prev - 1;
-        });
-      }, 1000);
-    } catch (err) {
-      setError(err.message);
-    }
-  };
-
   const handleAgentLogin = async () => {
     setError('');
-    if (!agentForm.phone || !agentForm.code) {
-      setError('请输入手机号和验证码');
+    if (!agentForm.username || !agentForm.password) {
+      setError('请输入用户名和密码');
       return;
     }
     setLoading(true);
     try {
-      const res = await agentLogin(agentForm.phone, agentForm.code);
+      const res = await agentLogin(agentForm.username, agentForm.password);
       login(res.data.token, res.data.user);
       navigate('/health-agent');
     } catch (err) {
@@ -115,14 +112,33 @@ function Login() {
         <CardContent sx={{ p: 3 }}>
           {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
 
-          <Tabs value={tab} onChange={(_, v) => { setTab(v); setError(''); }} centered>
+          <Tabs value={tab} onChange={(_, v) => { setTab(v); setError(''); }} centered variant="scrollable" scrollButtons="auto">
+            <Tab icon={<AdminPanelSettings />} label="管理员" />
             <Tab icon={<Factory />} label="工厂" />
-            <Tab icon={<LocalHospital />} label="体检对接人" />
-            <Tab icon={<Science />} label="C单位" />
+            <Tab icon={<LocalHospital />} label="体检" />
+            <Tab icon={<Science />} label="卫生托管" />
           </Tabs>
 
-          {/* Factory Login */}
+          {/* Admin Login */}
           <TabPanel value={tab} index={0}>
+            <TextField
+              fullWidth label="用户名" margin="normal" value={adminForm.username}
+              onChange={(e) => setAdminForm({ ...adminForm, username: e.target.value })}
+              onKeyPress={(e) => e.key === 'Enter' && handleAdminLogin()}
+            />
+            <TextField
+              fullWidth label="密码" type="password" margin="normal" value={adminForm.password}
+              onChange={(e) => setAdminForm({ ...adminForm, password: e.target.value })}
+              onKeyPress={(e) => e.key === 'Enter' && handleAdminLogin()}
+            />
+            <Button fullWidth variant="contained" size="large" sx={{ mt: 2 }}
+              onClick={handleAdminLogin} disabled={loading}>
+              {loading ? <CircularProgress size={24} /> : '登录'}
+            </Button>
+          </TabPanel>
+
+          {/* Factory Login */}
+          <TabPanel value={tab} index={1}>
             <TextField
               fullWidth label="用户名" margin="normal" value={factoryForm.username}
               onChange={(e) => setFactoryForm({ ...factoryForm, username: e.target.value })}
@@ -139,37 +155,26 @@ function Login() {
             </Button>
           </TabPanel>
 
-          {/* Health Agent Login */}
-          <TabPanel value={tab} index={1}>
+          {/* Health Agent (体检) Login */}
+          <TabPanel value={tab} index={2}>
             <TextField
-              fullWidth label="手机号" margin="normal" value={agentForm.phone}
-              onChange={(e) => setAgentForm({ ...agentForm, phone: e.target.value })}
-              InputProps={{
-                startAdornment: <InputAdornment position="start"><Phone /></InputAdornment>,
-              }}
+              fullWidth label="用户名" margin="normal" value={agentForm.username}
+              onChange={(e) => setAgentForm({ ...agentForm, username: e.target.value })}
+              onKeyPress={(e) => e.key === 'Enter' && handleAgentLogin()}
             />
-            <Box sx={{ display: 'flex', gap: 1, mt: 1 }}>
-              <TextField
-                fullWidth label="验证码" value={agentForm.code}
-                onChange={(e) => setAgentForm({ ...agentForm, code: e.target.value })}
-                onKeyPress={(e) => e.key === 'Enter' && handleAgentLogin()}
-              />
-              <Button
-                variant="outlined" sx={{ minWidth: 120 }}
-                onClick={handleSendCode} disabled={countdown > 0}
-              >
-                {countdown > 0 ? `${countdown}s` : '发送验证码'}
-              </Button>
-            </Box>
-            {codeSent && <Alert severity="info" sx={{ mt: 1 }}>验证码已发送（测试环境固定：123456）</Alert>}
+            <TextField
+              fullWidth label="密码" type="password" margin="normal" value={agentForm.password}
+              onChange={(e) => setAgentForm({ ...agentForm, password: e.target.value })}
+              onKeyPress={(e) => e.key === 'Enter' && handleAgentLogin()}
+            />
             <Button fullWidth variant="contained" size="large" sx={{ mt: 2 }}
               onClick={handleAgentLogin} disabled={loading}>
               {loading ? <CircularProgress size={24} /> : '登录'}
             </Button>
           </TabPanel>
 
-          {/* C-Unit Login */}
-          <TabPanel value={tab} index={2}>
+          {/* 卫生托管 Login */}
+          <TabPanel value={tab} index={3}>
             <TextField
               fullWidth label="用户名" margin="normal" value={cunitForm.username}
               onChange={(e) => setCunitForm({ ...cunitForm, username: e.target.value })}

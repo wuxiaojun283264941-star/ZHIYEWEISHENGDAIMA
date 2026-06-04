@@ -78,7 +78,7 @@ function TaskDetail() {
         {task.status === 'in_progress' && (
           <Button variant="contained" color="success" startIcon={<CheckCircle />}
             onClick={() => setCompleteOpen(true)}>
-            完成推送C单位
+            完成推送卫生托管
           </Button>
         )}
       </Box>
