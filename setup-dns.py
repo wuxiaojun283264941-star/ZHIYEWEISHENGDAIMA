@@ -5,8 +5,8 @@ import sys
 import os
 
 # ============ 配置 ============
-ACCESS_KEY_ID = 'ENV_AK_ID'
-ACCESS_KEY_SECRET = 'ENV_AK_SECRET'
+ACCESS_KEY_ID = os.environ.get('ALI_AK_ID', '')
+ACCESS_KEY_SECRET = os.environ.get('ALI_AK_SECRET', '')
 DOMAIN = 'lvhuianquan.icu'
 NAS_IPV6 = '2409:8a20:6611:ab90:cb3:73ff:fec9:394d'
 
